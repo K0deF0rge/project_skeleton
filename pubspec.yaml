@@ -1,0 +1,31 @@
+name: project_skeleton
+description: "A new Flutter project."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.0-182.0.dev
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  supabase_flutter: ^2.10.3
+  json_annotation: ^4.9.0
+  shared_preferences: ^2.5.3
+  mocktail: ^1.0.4
+  json_serializable: ^6.11.1
+  build_runner: ^2.10.0
+  flutter_dotenv: ^6.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - .env
