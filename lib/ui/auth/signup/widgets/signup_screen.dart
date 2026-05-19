@@ -5,6 +5,7 @@ import '../../../../utils/result.dart';
 import '../../../../utils/validators/email_validator.dart';
 import '../../../../utils/validators/password_validator.dart';
 import '../../../../data/repositories/auth/auth_repository_provider.dart';
+import '../../../core/localization/applocalization.dart';
 import '../view_models/signup_viewmodel.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -99,7 +100,19 @@ class _SignupScreenState extends State<SignupScreen> {
               TextFormField(
                 controller: _emailController,
                 decoration: const InputDecoration(labelText: 'E-mail'),
-                validator: EmailValidator.validator,
+                validator: (String? email) {
+                  LocalizationKey? validationKey = EmailValidator.validator(
+                    email,
+                  );
+
+                  if (validationKey != null) {
+                    return AppLocalization.of(
+                      context,
+                    ).getTextByKey(validationKey);
+                  }
+
+                  return null;
+                },
               ),
               colDividerMedium,
               TextFormField(
