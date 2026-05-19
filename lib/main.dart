@@ -6,11 +6,11 @@ import 'data/repositories/auth/auth_repository_remote.dart';
 import 'data/services/api/supabase/auth_service.dart';
 import 'data/services/local/local_service.dart';
 import 'data/services/local/shared_preferences.dart';
-import 'my_app.dart';
 import 'data/repositories/user/user_repository_remote.dart';
 import 'data/services/api/supabase/api_service.dart';
 import 'domain/models/user/user.dart';
 import 'utils/extensions/context.dart';
+import 'my_app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

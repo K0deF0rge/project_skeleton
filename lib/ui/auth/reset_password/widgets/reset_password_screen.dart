@@ -46,7 +46,7 @@ class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
       );
       return;
     } else {
-      context.showSnackBar(( _viewmodel.reset.result as Ok<String>).value);
+      context.showSnackBar((_viewmodel.reset.result as Ok<String>).value);
       Navigator.of(context).pop();
     }
   }
