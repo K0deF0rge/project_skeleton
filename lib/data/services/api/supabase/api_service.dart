@@ -77,14 +77,11 @@ class APIService<T extends BaseModel> extends ChangeNotifier {
 
       return Result.ok(data);
     } on PostgrestException catch (error) {
-      AppLogger.error('error PostgrestException', error, StackTrace.current);
+      AppLogger.error('error PostgrestException', error, stackTrace: StackTrace.current);
       return Result.error(error);
     } on Exception catch (error) {
-      AppLogger.error('error', error, StackTrace.current);
+      AppLogger.error('error', error, stackTrace: StackTrace.current);
       return Result.error(error);
-    } catch (error) {
-      AppLogger.error('error', error, StackTrace.current);
-      return Result.error(Exception('Erro desconhecido'));
     }
   }
 

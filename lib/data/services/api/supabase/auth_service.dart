@@ -63,7 +63,7 @@ class AuthService {
 
       return Result.ok(res.user!);
     } on AuthException catch (error) {
-      AppLogger.error('auth_service: signin authException ${error.message}', error, StackTrace.current);
+      AppLogger.error('auth_service: signin authException ${error.message}', error, stackTrace: StackTrace.current);
       return Result.error(error);
     } on Exception catch (error) {
       return Result.error(error);
@@ -122,7 +122,7 @@ class AuthService {
       AppLogger.debug('auth_service: Signup res ${res.user}');
       return Result.ok(res.user!);
     } on AuthException catch (error) {
-      AppLogger.error('auth_service: Signup error ${error.message}', error, StackTrace.current);
+      AppLogger.error('auth_service: Signup error ${error.message}', error, stackTrace: StackTrace.current);
 
       return Result.error(error);
     } on Exception catch (error) {
