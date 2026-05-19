@@ -1,34 +1,32 @@
+import '../../ui/core/localization/applocalization.dart';
 import '../exceptions/email_exception.dart';
 
-enum ResultEmailValidator {
-  emptyEmail('Digite um e-mail'),
-  invalidEmail('Digite um e-mail válido'),
-  validEmail('Confira o seu e-mail para utilizar o link mágico!');
-  
-  final String text;
-  const ResultEmailValidator(this.text);
-}
-
 class EmailValidator {
-  static EmailException? validate(String? email) {
-    if (email == null || email == '') return EmailException(ResultEmailValidator.emptyEmail.text);
+  static const String _emailRegexPattern =
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$';
 
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    );
+  static final RegExp _emailRegex = RegExp(_emailRegexPattern);
 
-    if (!emailRegex.hasMatch(email)) return EmailException(ResultEmailValidator.invalidEmail.text);
+  static EmailException? validate(
+    String? email,
+  ) {
+    final LocalizationKey? invalidKey = _isInvalid(email);
+    if (invalidKey != null) {
+      return EmailException(invalidKey);
+    }
+
     return null;
   }
 
-  static String? validator(String? email) {
-    if (email == null || email == '') return ResultEmailValidator.emptyEmail.text;
+  static LocalizationKey? validator(
+    String? email,
+  ) {
+    return _isInvalid(email);
+  }
 
-    final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
-    );
-
-    if (!emailRegex.hasMatch(email)) return ResultEmailValidator.invalidEmail.text;
+  static LocalizationKey? _isInvalid(String? email) {
+    if (email == null || email.isEmpty) return LocalizationKey.emailEmptyError;
+    if (!_emailRegex.hasMatch(email)) return LocalizationKey.emailInvalidError;
     return null;
   }
 }

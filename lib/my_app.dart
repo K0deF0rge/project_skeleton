@@ -1,3 +1,5 @@
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 import 'core/logger.dart';
 import 'data/model/user_state.dart';
 import 'data/repositories/auth/auth_repository_provider.dart';
@@ -5,6 +7,7 @@ import 'data/repositories/user/user_repository_provider.dart';
 import 'routing/routing.dart';
 import 'ui/auth/signin/widgets/signin_screen.dart';
 import 'ui/auth/splash/widgets/splash_screen.dart';
+import 'ui/core/localization/applocalization.dart';
 import 'ui/core/themes/theme.dart';
 import 'ui/home/widgets/home_screen.dart';
 import 'utils/extensions/context.dart';
@@ -54,6 +57,11 @@ class _MyAppState extends State<MyApp> {
           themeAnimationCurve: Curves.ease,
           theme: AppTheme.light,
           darkTheme: AppTheme.dark,
+          localizationsDelegates: [
+            GlobalWidgetsLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            AppLocalizationDelegate(),
+          ],
           home: SafeArea(
             child: ValueListenableBuilder<UserState>(
               valueListenable: widget.authRepository.userState,

@@ -1,7 +1,9 @@
+import '../../ui/core/localization/applocalization.dart';
+
 class EmailException implements Exception {
-  final String message;
-  EmailException(this.message);
+  final LocalizationKey messageKey;
+  EmailException(this.messageKey);
 
   @override
-  String toString() => message;
+  String toString() => messageKey.name;
 }
