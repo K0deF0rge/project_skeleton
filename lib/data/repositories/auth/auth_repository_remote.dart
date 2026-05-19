@@ -41,8 +41,9 @@ class AuthRepositoryRemote extends AuthRepository {
 
     if (result is Error<UserState>) return Result.error(result.error);
 
-    if (result is Ok<UserState>)
+    if (result is Ok<UserState>) {
       return Result.ok((result.value as UserLogged).user);
+    }
 
     return Result.error(Exception('Unknown error fetching user'));
   }

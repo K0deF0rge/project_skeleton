@@ -123,9 +123,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 listenable: _viewmodel.signup,
                 builder: (context, _) {
                   return ElevatedButton(
-                    onPressed: _viewmodel.signup.running
-                        ? null
-                        : _register,
+                    onPressed: _viewmodel.signup.running ? null : _register,
                     child: Text(
                       _viewmodel.signup.running
                           ? 'Cadastrando...'
