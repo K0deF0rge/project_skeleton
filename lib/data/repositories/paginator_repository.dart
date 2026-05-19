@@ -39,7 +39,7 @@ class RepositoryPaginator<T extends BaseModel> {
           : Result.ok(empty);
 
       if (res is Error) {
-        AppLogger.error('RepositoryPaginator error: ${res.toString()}', (res as Error).error, StackTrace.current);
+        AppLogger.error('RepositoryPaginator error: ${res.toString()}', (res as Error).error, stackTrace: StackTrace.current);
         return Result.error((res as Error).error);
       }
 
