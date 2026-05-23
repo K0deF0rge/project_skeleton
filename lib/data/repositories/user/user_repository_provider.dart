@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'user_repository.dart';
+import '../../../domain/repositories/user/user_repository.dart';
 
-export 'user_repository.dart';
+export '../../../domain/repositories/user/user_repository.dart';
 
 class UserRepositoryProvider extends InheritedWidget {
   const UserRepositoryProvider({super.key, required this.userRepository, required super.child});

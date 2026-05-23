@@ -5,10 +5,12 @@ import '../base.dart';
 
 export '../../../utils/enums/modules.dart';
 
-part 'role.g.dart';
+part 'role_model.g.dart';
+
+typedef Roles = List<RoleModel>;
 
 @JsonSerializable(fieldRename: FieldRename.snake)
-class Role extends BaseModel {
+class RoleModel extends BaseModel {
   @JsonKey(required: true)
   final int id;
   final String userId;
@@ -20,7 +22,7 @@ class Role extends BaseModel {
   @JsonKey(defaultValue: false)
   final bool canDelete;
 
-  Role(
+  RoleModel(
     this.id, {
     required this.userId,
     required this.module,
@@ -32,12 +34,12 @@ class Role extends BaseModel {
   bool get isFullAccess => canRead && canWrite && canDelete;
 
   @override
-  Map<String, dynamic> toJson() => _$RoleToJson(this);
+  Map<String, dynamic> toJson() => _$RoleModelToJson(this);
 
   @override
-  Role toModel(Map<String, dynamic> json) => _$RoleFromJson(json);
+  RoleModel toModel(Map<String, dynamic> json) => _$RoleModelFromJson(json);
 
-  static Role fromJson(Map<String, dynamic> json) => _$RoleFromJson(json);
+  static RoleModel fromJson(Map<String, dynamic> json) => _$RoleModelFromJson(json);
 
   static String getTableName() => 'roles';
 }

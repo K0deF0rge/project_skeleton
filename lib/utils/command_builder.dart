@@ -1,15 +1,17 @@
 import 'package:flutter/material.dart';
 
+import '../domain/models/base.dart';
 import 'command.dart';
+import 'result.dart';
 
-class CommandBuilder<T extends Command> extends StatefulWidget {
-  final T command;
+class Command0BuilderList<T extends BaseModel> extends StatelessWidget {
+  final Command0<List<T>> command;
   final Widget? Function(BuildContext)? onRunning;
-  final Widget? Function(BuildContext)? onCompleted;
+  final Widget? Function(BuildContext, List<T>)? onCompleted;
   final Widget? Function(BuildContext)? onError;
   final Widget? initialWidget;
 
-  const CommandBuilder({
+  const Command0BuilderList({
     super.key,
     required this.command,
     this.onRunning,
@@ -19,35 +21,33 @@ class CommandBuilder<T extends Command> extends StatefulWidget {
   });
 
   @override
-  State<CommandBuilder> createState() => _CommandBuilderState();
-}
-
-class _CommandBuilderState extends State<CommandBuilder> {
-  @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: widget.command,
+      listenable: command,
       builder: (BuildContext context, _) {
-        if (widget.command.running) {
-          if (widget.onRunning != null) {
-            final w = widget.onRunning!(context);
+        if (command.running) {
+          if (onRunning != null) {
+            final w = onRunning!(context);
             if (w != null) return w;
           }
 
           return const Center(child: CircularProgressIndicator());
-        } else if (widget.command.completed) {
-          if (widget.onCompleted != null) {
-            final w = widget.onCompleted!(context);
+        } else if (command.completed) {
+          if (onCompleted != null) {
+            final list = (command.result as Ok<List<T>>).value;
+
+            final w = onCompleted!(context, list);
+
             if (w != null) return w;
           }
-        } else if (widget.command.error) {
-          if (widget.onError != null) {
-            final w = widget.onError!(context);
+        } else if (command.error) {
+          if (onError != null) {
+            final w = onError!(context);
             if (w != null) return w;
           }
         }
 
-        return widget.initialWidget ?? const SizedBox.shrink();
+        return initialWidget ?? const SizedBox.shrink();
       },
     );
   }

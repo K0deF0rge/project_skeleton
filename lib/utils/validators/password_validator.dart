@@ -1,50 +1,38 @@
+import '../../ui/core/localization/applocalization.dart';
 import '../exceptions/password_exception.dart';
-
-enum ResultPasswordValidator {
-  emptyPassword('Digite uma senha'),
-  shortPassword('A senha deve ter no mínimo 8 caracteres'),
-  noUpperCase('A senha deve conter pelo menos uma letra maiúscula'),
-  noLowerCase('A senha deve conter pelo menos uma letra minúscula'),
-  noNumber('A senha deve conter pelo menos um número'),
-  noSpecialChar('A senha deve conter pelo menos um caractere especial (!@#\$%^&*)'),
-  validPassword('Senha válida');
-
-  final String text;
-  const ResultPasswordValidator(this.text);
-}
 
 class PasswordValidator {
   static PasswordException? validate(String? password) {
     if (password == null || password.isEmpty) {
-      return PasswordException(ResultPasswordValidator.emptyPassword.text);
+      return PasswordException(LocalizationKey.passwordEmptyError);
     }
 
     if (password.length < 8) {
-      return PasswordException(ResultPasswordValidator.shortPassword.text);
+      return PasswordException(LocalizationKey.passwordShortError);
     }
 
     if (!_hasUpperCase(password)) {
-      return PasswordException(ResultPasswordValidator.noUpperCase.text);
+      return PasswordException(LocalizationKey.passwordNoUpperCaseError);
     }
 
     if (!_hasLowerCase(password)) {
-      return PasswordException(ResultPasswordValidator.noLowerCase.text);
+      return PasswordException(LocalizationKey.passwordNoLowerCaseError);
     }
 
     if (!_hasNumber(password)) {
-      return PasswordException(ResultPasswordValidator.noNumber.text);
+      return PasswordException(LocalizationKey.passwordNoNumberError);
     }
 
     if (!_hasSpecialChar(password)) {
-      return PasswordException(ResultPasswordValidator.noSpecialChar.text);
+      return PasswordException(LocalizationKey.passwordNoSpecialCharError);
     }
 
     return null;
   }
 
-  static String? validator(String? password) {
+  static LocalizationKey? validator(String? password) {
     final exception = validate(password);
-    return exception?.message;
+    return exception?.localizationKey;
   }
 
   static bool _hasUpperCase(String password) {
@@ -63,4 +51,3 @@ class PasswordValidator {
     return password.contains(RegExp(r'[!@#\$%^&*]'));
   }
 }
-

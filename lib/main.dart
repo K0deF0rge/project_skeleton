@@ -1,14 +1,16 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-import 'data/model/user_state.dart';
+import 'data/models/user_state.dart';
 import 'data/repositories/auth/auth_repository_remote.dart';
+import 'data/repositories/role/role_repository_remote.dart';
 import 'data/services/api/supabase/auth_service.dart';
 import 'data/services/local/local_service.dart';
 import 'data/services/local/shared_preferences.dart';
 import 'data/repositories/user/user_repository_remote.dart';
 import 'data/services/api/supabase/api_service.dart';
-import 'domain/models/user/user.dart';
+import 'domain/models/role/role_model.dart';
+import 'domain/models/user/user_model.dart';
 import 'utils/extensions/context.dart';
 import 'my_app.dart';
 
@@ -36,6 +38,13 @@ void main() async {
           supabase: supabase,
           tableName: UserModel.getTableName(),
           fromJson: UserModel.fromJson,
+        ),
+      ),
+      roleRepository: RoleRepositoryRemote(
+        apiService: APIService<RoleModel>(
+          supabase: supabase,
+          tableName: RoleModel.getTableName(),
+          fromJson: RoleModel.fromJson,
         ),
       ),
     ),

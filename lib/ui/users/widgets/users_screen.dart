@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/logger.dart';
 import '../../../data/repositories/user/user_repository_provider.dart';
-import '../../../domain/models/user/user.dart';
+import '../../../domain/models/user/user_model.dart';
 import '../../../utils/command_builder.dart';
-import '../../../utils/result.dart';
+import '../../core/localization/applocalization.dart';
 import '../view_models/users_viewmodel.dart';
 
 class UsersScreen extends StatefulWidget {
@@ -19,6 +18,7 @@ class UsersScreen extends StatefulWidget {
 
 class _UsersScreenState extends State<UsersScreen> {
   late UsersViewmodel _viewmodel;
+  late AppLocalization localization;
 
   @override
   void didChangeDependencies() {
@@ -33,32 +33,26 @@ class _UsersScreenState extends State<UsersScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.debug(
-      'Building UsersScreen with ${_viewmodel.userRepository.runtimeType}',
-    );
-
+    localization = AppLocalization.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Usuários')),
-      body: Center(
-        child: CommandBuilder(
+      appBar: AppBar(title: Text(localization.usersTitle)),
+      body: SafeArea(
+        child: Command0BuilderList<UserModel>(
           command: _viewmodel.getUsers,
           initialWidget: const CircularProgressIndicator(),
           onRunning: (_) => const CircularProgressIndicator(),
-          onCompleted: (_) {
-            final users =
-                (_viewmodel.getUsers.result as Ok<List<UserModel>>).value;
-                
+          onCompleted: (_, users) {
             if (users.isEmpty) {
               return Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.hourglass_empty),
-                  const Text('Sem usuários'),
+                  Text(localization.usersEmptyState),
                   ElevatedButton(
                     onPressed: () {
                       _viewmodel.getUsers.execute();
                     },
-                    child: const Text('Tentar novamente'),
+                    child: Text(localization.retryButton),
                   ),
                 ],
               );

@@ -1,8 +1,8 @@
 import '../../ui/core/localization/applocalization.dart';
 
-class PasswordException implements Exception {
+class CredentialsException implements Exception {
   final LocalizationKey localizationKey;
-  PasswordException(this.localizationKey);
+  CredentialsException(this.localizationKey);
 
   @override
   String toString() => localizationKey.name;

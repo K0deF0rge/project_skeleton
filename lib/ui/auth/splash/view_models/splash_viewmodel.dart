@@ -1,5 +1,5 @@
 
-import '../../../../data/repositories/auth/auth_repository.dart';
+import '../../../../domain/repositories/auth/auth_repository.dart';
 
 class SplashViewmodel {
   final AuthRepository authRepository;

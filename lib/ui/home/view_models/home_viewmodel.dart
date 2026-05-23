@@ -1,5 +1,5 @@
 
-import '../../../../data/repositories/auth/auth_repository.dart';
+import '../../../domain/repositories/auth/auth_repository.dart';
 import '../../../utils/result.dart';
 
 class HomeViewmodel {
@@ -7,7 +7,7 @@ class HomeViewmodel {
 
   final AuthRepository authRepository;
 
-  Future<Result<void>> signOut() async {
+  FutureResultVoid signOut() async {
     return await authRepository.signOut();
   }
 }

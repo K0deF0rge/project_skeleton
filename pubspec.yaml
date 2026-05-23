@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   cupertino_icons: ^1.0.8
   supabase_flutter: ^2.10.3
@@ -16,17 +18,23 @@ dependencies:
   shared_preferences: ^2.5.3
   flutter_dotenv: ^6.0.0
   logging: ^1.3.0
+  cached_network_image: ^3.4.1
+  freezed_annotation: ^3.1.0
+  mocktail_image_network: ^1.3.0
 
 dev_dependencies:
   flutter_test:
+    sdk: flutter
+  integration_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
   build_runner: ^2.10.0
   freezed: ^3.2.5
   json_serializable: ^6.11.1
+  mocktail: ^1.0.4
 
 flutter:
   uses-material-design: true
-  assets:
-    - .env
+  # assets:
+  #   - .env

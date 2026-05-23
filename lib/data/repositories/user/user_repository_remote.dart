@@ -1,10 +1,10 @@
-import '../../../core/logger.dart';
-import '../../../domain/models/user/user.dart';
+
+import '../../../domain/models/user/user_model.dart';
 import '../../../utils/result.dart';
 import '../../services/api/supabase/api_service.dart';
 import '../../services/api/supabase/filters.dart';
 import '../../services/local/local_service.dart';
-import 'user_repository.dart';
+import '../../../domain/repositories/user/user_repository.dart';
 
 class UserRepositoryRemote extends UserRepository {
   final LocalService<UserModel>? localService;
@@ -13,23 +13,21 @@ class UserRepositoryRemote extends UserRepository {
   UserRepositoryRemote({this.localService, required this.apiService}) : super(service: apiService);
 
   @override
-  Future<Result<UserModel>> getUser({required String id}) async {
+  FutureResult<UserModel> getUser({required String id}) async {
     final userIdToFetch = id;
     final filters = [SupabaseFilter('id', SupabaseOperator.eq, userIdToFetch)];
-    AppLogger.debug("\n!!!UserRepositoryRemote: $filters $userIdToFetch !!!");
-    final userResult = await apiService.get(filters: filters, limit: 1, offset: 0);
-    AppLogger.debug("UserRepositoryRemote: userResult $userResult");
-    if (userResult is Error) return Result.error((userResult as Error).error);
 
-    final users = (userResult as Ok<List<UserModel>>).value;
-    AppLogger.debug("UserRepositoryRemote: users ${users.length}");
+    final userResult = await apiService.get(filters: filters, limit: 1, offset: 0);
+
+    if (userResult is Error<Users>) return Result.error(userResult.error);
+
+    final users = (userResult as Ok<Users>).value;
+
     if (users.isEmpty) {
-      return Result.error(Exception('Usuário(s) não encontrado(s)'));
+      return Result.error(Exception('Usuário não encontrado'));
     }
 
     final model = users.first;
-
-    AppLogger.debug("UserRepositoryRemote: model ${model.toJson()}");
 
     if (localService != null) {
       final saveResult = await localService!.save(model, key: model.id);
@@ -42,10 +40,10 @@ class UserRepositoryRemote extends UserRepository {
   }
   
   @override
-  Future<Result<List<UserModel>>> getUsers() async {
+  FutureResult<Users> getUsers() async {
     final result = await nextPage();
-    if (result is Error<List<UserModel>>) return Result.error(result.error);
-    final users = (result as Ok<List<UserModel>>).value;
+    if (result is Error<Users>) return result;
+    final users = (result as Ok<Users>).value;
 
     if (localService != null) {
       final saveResult = await localService!.saveArray(users);

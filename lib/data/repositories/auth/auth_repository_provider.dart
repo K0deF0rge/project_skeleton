@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'auth_repository.dart';
+import '../../../domain/repositories/auth/auth_repository.dart';
 
-export 'auth_repository.dart';
+export '../../../domain/repositories/auth/auth_repository.dart';
 
 class AuthRepositoryProvider extends InheritedWidget {
   const AuthRepositoryProvider({super.key, required this.authRepository, required super.child});

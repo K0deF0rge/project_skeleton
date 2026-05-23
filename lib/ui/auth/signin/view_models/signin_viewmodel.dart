@@ -1,23 +1,20 @@
-
-import '../../../../data/model/sign_credentials.dart';
-import '../../../../data/repositories/auth/auth_repository.dart';
+import '../../../../data/models/credentials.dart';
+import '../../../../domain/use_cases/auth/auth_sign_in_use_case.dart';
 import '../../../../utils/command.dart';
 import '../../../../utils/result.dart';
 
 class SigninViewmodel {
-  SigninViewmodel({required AuthRepository authRepository})
-    : _authRepository = authRepository {
-    signin = Command2<String, String, String>(_signIn);
+  SigninViewmodel({required AuthSignInUseCase signInUseCase})
+    : _signInUseCase = signInUseCase {
+    signin = Command1<void, Credentials>(_signIn);
   }
 
-  final AuthRepository _authRepository;
+  final AuthSignInUseCase _signInUseCase;
 
-  late Command2<String, String, String> signin;
+  late Command1<void, Credentials> signin;
 
-  Future<Result<String>> _signIn(String email, String password) async {
-    final result = await _authRepository.signIn(SignCredentials(email: email, password: password));
-
-    return result;
+  FutureResultVoid _signIn(Credentials credentials) async {
+    return await _signInUseCase.execute(credentials);
   }
 
   // Future<Result<String>> _signInWithOtp(String email) async {

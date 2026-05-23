@@ -1,5 +1,4 @@
 
-import '../../core/logger.dart';
 import '../../domain/models/base.dart';
 import '../../utils/result.dart';
 import '../services/api/supabase/api_service.dart';
@@ -38,9 +37,8 @@ class RepositoryPaginator<T extends BaseModel> {
             )
           : Result.ok(empty);
 
-      if (res is Error) {
-        AppLogger.error('RepositoryPaginator error: ${res.toString()}', (res as Error).error, stackTrace: StackTrace.current);
-        return Result.error((res as Error).error);
+      if (res is Error<List<T>>) {
+        return res;
       }
 
       final items = (res as Ok<List<T>>).value;

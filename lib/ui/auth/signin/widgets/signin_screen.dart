@@ -1,15 +1,22 @@
 import '../../../../config/constants.dart';
-import '../../../../core/logger.dart';
 import '../../../../data/repositories/auth/auth_repository_provider.dart';
+import '../../../../data/repositories/role/user_repository_provider.dart';
+import '../../../../data/repositories/user/user_repository_provider.dart';
+import '../../../../domain/use_cases/auth/auth_sign_in_use_case.dart';
 import '../../../../utils/extensions/context.dart';
 import '../../../../utils/result.dart';
+import '../../../../utils/validators/credentials_validator.dart';
+import '../../../core/localization/applocalization.dart';
+import '../../../home/widgets/home_screen.dart';
 import '../../reset_password/widgets/reset_password_screen.dart';
 import '../../signup/widgets/signup_screen.dart';
 import '../view_models/signin_viewmodel.dart';
 
 class SigninScreen extends StatefulWidget {
-  const SigninScreen({super.key});
   static String routeName = "/signin";
+
+  const SigninScreen({super.key, this.viewmodel});
+  final SigninViewmodel? viewmodel;
 
   @override
   State<SigninScreen> createState() => _SigninScreenState();
@@ -17,122 +24,146 @@ class SigninScreen extends StatefulWidget {
 
 class _SigninScreenState extends State<SigninScreen> {
   late SigninViewmodel viewmodel;
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
-  late AuthRepository authRepository;
-
-  void _signIn() async {
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-    viewmodel.signin.execute(email, password);
-  }
-
-  bool _viewmodelInitialized = false;
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  late AppLocalization localization;
 
   @override
   void initState() {
     super.initState();
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_viewmodelInitialized) {
-      authRepository = AuthRepositoryProvider.of(context);
-      viewmodel = SigninViewmodel(authRepository: authRepository);
-      viewmodel.signin.addListener(_onResult);
-      _viewmodelInitialized = true;
+    if (widget.viewmodel != null) {
+      viewmodel = widget.viewmodel!;
+    } else {
+      viewmodel = SigninViewmodel(
+        signInUseCase: AuthSignInUseCase(
+          authRepository: AuthRepositoryProvider.of(context),
+          userRepository: UserRepositoryProvider.of(context),
+          roleRepository: RoleRepositoryProvider.of(context),
+        ),
+      );
     }
+    viewmodel.signin.addListener(onResult);
   }
 
   @override
   void dispose() {
-    viewmodel.signin.removeListener(_onResult);
-    _emailController.dispose();
-    _passwordController.dispose();
+    viewmodel.signin.removeListener(onResult);
+    emailController.dispose();
+    passwordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.debug('BUILDING (SigninScreen) BUILDING');
-
+    localization = AppLocalization.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(
-          vertical: mediumSpacing,
-          horizontal: largeSpacing,
-        ),
-        child: Column(
-          children: [
-            colDividerLarge2,
-            Text(
-              'Entre utilizando E-mail e Senha.',
-              style: Theme.of(context).textTheme.titleLarge,
-            ),
-            colDividerLarge2,
-            TextFormField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'E-mail'),
-            ),
-            colDividerMedium,
-            TextFormField(
-              controller: _passwordController,
-              decoration: const InputDecoration(labelText: 'Senha'),
-              obscureText: true,
-            ),
-            colDividerLarge2,
-            ListenableBuilder(
-              listenable: viewmodel.signin,
-              builder: (context, _) {
-                return ElevatedButton(
-                  onPressed: _signIn,
-                  child: Text(
-                    viewmodel.signin.running ? 'Entrando...' : 'Entrar',
-                  ),
-                );
-              },
-            ),
-            colDividerSmall,
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    ResetPasswordScreen.routeName,
-                  ),
-                  child: const Text('Redefinir a senha'),
+      appBar: AppBar(title: Text(localization.signInTitle)),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            vertical: mediumSpacing,
+            horizontal: largeSpacing,
+          ),
+          child: Column(
+            children: [
+              colDividerLarge2,
+              Text(
+                localization.signInSubtitle,
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              colDividerLarge2,
+              TextFormField(
+                controller: emailController,
+                decoration: InputDecoration(labelText: localization.emailLabel),
+              ),
+              colDividerMedium,
+              TextFormField(
+                controller: passwordController,
+                decoration: InputDecoration(
+                  labelText: localization.passwordLabel,
                 ),
-                colDividerSmall,
-                TextButton(
-                  onPressed: () => Navigator.pushNamed(
-                    context,
-                    SignupScreen.routeName,
+                obscureText: true,
+              ),
+              colDividerLarge2,
+              ListenableBuilder(
+                listenable: viewmodel.signin,
+                builder: (context, _) {
+                  return ElevatedButton(
+                    onPressed: signIn,
+                    child: Text(
+                      viewmodel.signin.running
+                          ? localization.signInLoadingLabel
+                          : localization.signInButtonLabel,
+                    ),
+                  );
+                },
+              ),
+              colDividerSmall,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  TextButton(
+                    onPressed: () => Navigator.pushNamed(
+                      context,
+                      ResetPasswordScreen.routeName,
+                    ),
+                    child: Text(localization.forgotPasswordButton),
                   ),
-                  child: const Text('Cadastrar-se'),
-                ),
-              ],
-            ),
-          ],
+                  colDividerSmall,
+                  TextButton(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, SignupScreen.routeName),
+                    child: Text(localization.signUpButton),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  void _onResult() {
+  void onResult() {
     if (!mounted) return;
-    AppLogger.debug("_onResult ${viewmodel.signin.result}");
+
     if (viewmodel.signin.result == null) return;
+
+    LocalizationKey locKey;
+
+    if (viewmodel.signin.completed) {
+      locKey = LocalizationKey.signInSuccess;
+      viewmodel.signin.clearResult();
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    } else {
+      final error = (viewmodel.signin.result as Error).error;
+
+      switch (error) {
+        case CredentialsException(:final localizationKey):
+          locKey = localizationKey;
+          break;
+        default:
+          locKey = LocalizationKey.unknownError;
+          break;
+      }
+    }
+
     context.showSnackBar(
-      viewmodel.signin.completed
-          ? (viewmodel.signin.result! as Ok<String>).value
-          : (viewmodel.signin.result as Error).error.toString(),
+      localization.getTextByKey(locKey),
       isError: viewmodel.signin.error,
     );
-    // viewmodel.signin.clearResult();
+  }
+
+  void signIn() {
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+    viewmodel.signin.execute(Credentials(email: email, password: password));
   }
 }

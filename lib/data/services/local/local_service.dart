@@ -16,7 +16,7 @@ class LocalService<T extends BaseModel> {
 
   Map<String, dynamic> _model(String json) => jsonDecode(json) as Map<String, dynamic>;
 
-  FutureResult save(T model, {String key = ''}) async {
+  FutureResultVoid save(T model, {String key = ''}) async {
     final k = '$_key${key.isNotEmpty ? '_$key' : ''}';
     try {
       AppLogger.debug("\nLocalServicee: K $k - map ${_map(model)}");
@@ -61,7 +61,7 @@ class LocalService<T extends BaseModel> {
     }
   }
 
-  FutureResult saveArray(List<T> models, {String key = ''}) async {
+  FutureResultVoid saveArray(List<T> models, {String key = ''}) async {
     final k = '$_key${key.isNotEmpty ? '_$key' : ''}';
 
     if (models.isEmpty) {

@@ -1,4 +1,5 @@
 typedef FutureResult<T> = Future<Result<T>>;
+typedef FutureResultVoid = Future<Result<void>>;
 
 sealed class Result<T> {
   const Result();

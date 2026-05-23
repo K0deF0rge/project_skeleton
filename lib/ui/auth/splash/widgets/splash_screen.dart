@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-import '../../../../core/logger.dart';
 import '../../../../data/repositories/auth/auth_repository_provider.dart';
 import '../view_models/splash_viewmodel.dart';
 
@@ -30,9 +29,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.debug('Building SplashScreen');
     return const Scaffold(
-      body: Center(child: Icon(Icons.ac_unit_rounded, size: 100.0)),
+      body: SafeArea(child: Center(child: Icon(Icons.ac_unit_rounded, size: 100.0))),
     );
   }
 }

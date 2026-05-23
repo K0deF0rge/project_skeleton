@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-import '../../../../core/logger.dart';
 import '../../../../domain/models/base.dart';
 import '../../../../utils/result.dart';
 import 'filters.dart';
@@ -33,8 +32,6 @@ class APIService<T extends BaseModel> extends ChangeNotifier {
     bool noLimit = false,
   }) async {
     try {
-      AppLogger.debug("\n!!!!!API_SERVICE!!!!!");
-      AppLogger.debug("api_service: Tablename $tableName");
       var query = supabase.from(tableName).select();
 
       if (filters != null) {
@@ -45,8 +42,6 @@ class APIService<T extends BaseModel> extends ChangeNotifier {
 
       final bool useInternalPagination =
           !noLimit && limit == null && offset == null;
-
-      AppLogger.debug("api_service: useInternalPagination $useInternalPagination limit $limit offset $offset");
 
       final dynamic result;
       if (noLimit) {
@@ -59,11 +54,7 @@ class APIService<T extends BaseModel> extends ChangeNotifier {
         result = await query.range(_offset, _offset + _pageSize - 1);
       }
 
-      AppLogger.debug("api_service: result query $result");
-
       final data = (result as List<Map<String, dynamic>>).map<T>(fromJson).toList();
-
-      AppLogger.debug("api_service: data ${data.runtimeType}");
 
       if (!noLimit) {
         if (useInternalPagination) {
@@ -77,17 +68,16 @@ class APIService<T extends BaseModel> extends ChangeNotifier {
 
       return Result.ok(data);
     } on PostgrestException catch (error) {
-      AppLogger.error('error PostgrestException', error, stackTrace: StackTrace.current);
       return Result.error(error);
     } on Exception catch (error) {
-      AppLogger.error('error', error, stackTrace: StackTrace.current);
       return Result.error(error);
+    } catch (error) {
+      return Result.error(Exception('Erro desconhecido'));
     }
   }
 
   Future<Result<T>> update(T model) async {
     try {
-      AppLogger.debug('update model ${model.toJson()}');
       await supabase
           .from(tableName)
           .update(model.toJson())

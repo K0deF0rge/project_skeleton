@@ -13,13 +13,4 @@ enum Modules {
   }
 
   String toShortString() => name;
-
-  String get title {
-    switch (this) {
-      case users:
-        return 'Usuários';
-      case products:
-        return 'Produtos';
-    }
-  }
 }
