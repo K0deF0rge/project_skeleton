@@ -2,35 +2,37 @@ import 'package:json_annotation/json_annotation.dart';
 
 import '../../../utils/enums/user_role.dart';
 import '../base.dart';
-import '../role/role.dart';
+import '../role/role_model.dart';
 
-part 'user.g.dart';
+part 'user_model.g.dart';
+
+typedef Users = List<UserModel>;
 
 @JsonSerializable(fieldRename: FieldRename.snake)
 class UserModel extends BaseModel {
   @JsonKey(required: true)
   final String id;
   @JsonKey(defaultValue: "")
-  String number;
+  final String number;
   @JsonKey(defaultValue: "")
-  String name;
+  final String name;
   @JsonKey(defaultValue: "")
-  String email;
+  final String email;
   @JsonKey(defaultValue: UserRole.user)
-  UserRole role;
+  final UserRole role;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  final List<Role> roles;
+  List<RoleModel> roles;
 
-  set roles(List<Role> newRoles) {
+  void setRoles(List<RoleModel> newRoles) {
     roles.clear();
     roles.addAll(newRoles);
   }
 
   @JsonKey(name: 'created_at')
-  DateTime createdAt;
+  final DateTime createdAt;
 
   @JsonKey(name: 'updated_at')
-  DateTime updatedAt;
+  final DateTime updatedAt;
 
   UserModel(
     this.id, {
@@ -48,7 +50,7 @@ class UserModel extends BaseModel {
   bool hasPermission(Modules module, {bool read = false, bool write = false, bool del = false}) {
     final perm = roles.firstWhere(
       (p) => p.module == module,
-      orElse: () => Role(0, module: module, userId: ''),
+      orElse: () => RoleModel(0, module: module, userId: ''),
     );
 
     if (role == UserRole.owner) return true;

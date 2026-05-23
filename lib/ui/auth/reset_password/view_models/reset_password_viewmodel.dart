@@ -1,16 +1,22 @@
-import '../../../../data/repositories/auth/auth_repository.dart';
+import '../../../../data/models/credentials.dart';
+import '../../../../domain/use_cases/auth/auth_reset_password_use_case.dart';
 import '../../../../utils/command.dart';
 import '../../../../utils/result.dart';
 
 class ResetPasswordViewmodel {
-  final AuthRepository authRepository;
-  ResetPasswordViewmodel({required this.authRepository}) {
-    reset = Command1<String, String>(_resetPassword);
+  ResetPasswordViewmodel({
+    required AuthResetPasswordUseCase resetPasswordUseCase,
+  }) : _resetPasswordUseCase = resetPasswordUseCase {
+    resetPassword = Command1<void, String>(_resetPassword);
   }
 
-  late Command1<String, String> reset;
+  final AuthResetPasswordUseCase _resetPasswordUseCase;
 
-  Future<Result<String>> _resetPassword(String email) async {
-    return await authRepository.resetPassword(email);
+  late Command1<void, String> resetPassword;
+
+  FutureResultVoid _resetPassword(String email) async {
+    return await _resetPasswordUseCase.execute(
+      Credentials(email: email, password: ''),
+    );
   }
 }

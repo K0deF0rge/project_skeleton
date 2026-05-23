@@ -1,5 +1,6 @@
 import '../../../../config/constants.dart';
-import '../../../../core/logger.dart';
+import '../../../../domain/use_cases/auth/auth_reset_password_use_case.dart';
+import '../../../../utils/exceptions/email_exception.dart';
 import '../../../../utils/extensions/context.dart';
 import '../../../../utils/result.dart';
 import '../../../../utils/validators/email_validator.dart';
@@ -17,94 +18,132 @@ class ResetPasswordScreen extends StatefulWidget {
 }
 
 class _ResetPasswordScreenState extends State<ResetPasswordScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _emailController = TextEditingController();
-  late ResetPasswordViewmodel _viewmodel;
+  final formKey = GlobalKey<FormState>();
+  late TextEditingController emailController;
+  late ResetPasswordViewmodel viewmodel;
+  late AppLocalization localization;
+
+  @override
+  void initState() {
+    emailController = TextEditingController();
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.viewmodel != null) {
-      _viewmodel = widget.viewmodel!;
+      viewmodel = widget.viewmodel!;
     } else {
-      final authRepository = AuthRepositoryProvider.of(context);
-      _viewmodel = ResetPasswordViewmodel(authRepository: authRepository);
+      viewmodel = ResetPasswordViewmodel(
+        resetPasswordUseCase: AuthResetPasswordUseCase(
+          authRepository: AuthRepositoryProvider.of(context),
+        ),
+      );
     }
+    viewmodel.resetPassword.addListener(onResult);
   }
 
-  void _sendReset() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final email = _emailController.text.trim();
-    await _viewmodel.reset.execute(email);
-
-    if (!mounted) return;
-
-    if (_viewmodel.reset.error) {
-      context.showSnackBar(
-        'Erro ao enviar e-mail: ${(_viewmodel.reset.result as Error).error}',
-        isError: true,
-      );
-      return;
-    } else {
-      context.showSnackBar((_viewmodel.reset.result as Ok<String>).value);
-      Navigator.of(context).pop();
-    }
+  @override
+  void dispose() {
+    viewmodel.resetPassword.removeListener(onResult);
+    emailController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.debug('Building ResetPasswordScreen');
+    localization = AppLocalization.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Redefinir a senha')),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: mediumSpacing,
-            horizontal: largeSpacing,
-          ),
-          child: Column(
-            children: [
-              colDividerLarge2,
-              Text(
-                'Digite seu e-mail para receber instruções de redefinição.',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-              colDividerMedium,
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'E-mail'),
-                validator: (String? email) {
-                  LocalizationKey? validationKey = EmailValidator.validator(email);
+      appBar: AppBar(title: Text(localization.resetPasswordTitle)),
+      body: SafeArea(
+        child: Form(
+          key: formKey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: mediumSpacing,
+              horizontal: largeSpacing,
+            ),
+            child: Column(
+              children: [
+                colDividerLarge2,
+                Text(
+                  localization.resetPasswordSubtitle,
+                  style: Theme.of(context).textTheme.titleLarge,
+                ),
+                colDividerMedium,
+                TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(labelText: localization.emailLabel),
+                  validator: (String? email) {
+                    LocalizationKey? validationKey = EmailValidator.validator(
+                      email,
+                    );
 
-                  if (validationKey != null) {
-                    return AppLocalization.of(context).getTextByKey(validationKey);
-                  }
+                    if (validationKey != null) {
+                      return localization.getTextByKey(validationKey);
+                    }
 
-                  return null;
-                },
-              ),
-              colDividerLarge2,
-              ListenableBuilder(
-                listenable: _viewmodel.reset,
-                builder: (context, _) {
-                  return ElevatedButton(
-                    onPressed: _viewmodel.reset.running
-                        ? null
-                        : _sendReset,
-                    child: Text(
-                      _viewmodel.reset.running
-                          ? 'Enviando...'
-                          : 'Enviar e-mail',
-                    ),
-                  );
-                },
-              ),
-            ],
+                    return null;
+                  },
+                ),
+                colDividerLarge2,
+                ListenableBuilder(
+                  listenable: viewmodel.resetPassword,
+                  builder: (context, _) {
+                    return ElevatedButton(
+                      onPressed: viewmodel.resetPassword.running ? null : reset,
+                      child: Text(
+                        viewmodel.resetPassword.running
+                            ? localization.resetPasswordLoadingLabel
+                            : localization.resetPasswordButtonLabel,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void onResult() {
+    if (!mounted) return;
+
+    if (viewmodel.resetPassword.result == null) return;
+
+    LocalizationKey locKey;
+
+    if (viewmodel.resetPassword.completed) {
+      locKey = LocalizationKey.resetPasswordSuccess;
+      viewmodel.resetPassword.clearResult();
+      Navigator.pop(context);
+    } else {
+      final error =
+          (viewmodel.resetPassword.result as Error<LocalizationKey>).error;
+
+      switch (error) {
+        case EmailException(:final localizationKey):
+          locKey = localizationKey;
+          break;
+        default:
+          locKey = LocalizationKey.unknownError;
+          break;
+      }
+    }
+
+    context.showSnackBar(
+      localization.getTextByKey(locKey),
+      isError: viewmodel.resetPassword.error,
+    );
+  }
+
+  void reset() {
+    if (!formKey.currentState!.validate()) return;
+
+    final email = emailController.text.trim();
+    viewmodel.resetPassword.execute(email);
   }
 }

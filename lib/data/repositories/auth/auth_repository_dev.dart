@@ -1,33 +1,16 @@
-import '../../../domain/models/user/user.dart';
+import '../../../domain/models/user/user_model.dart';
 import '../../../utils/enums/user_role.dart';
 import '../../../utils/result.dart';
-import '../../model/sign_credentials.dart';
-import '../../model/user_state.dart';
-import 'auth_repository.dart';
+import '../../models/credentials.dart';
+import '../../models/user_state.dart';
+import '../../../domain/repositories/auth/auth_repository.dart';
 
 class AuthRepositoryDev extends AuthRepository {
-  @override
-  Future<Result<String>> signInWithOtp({required String email}) async {
-    return const Result.ok("");
-  }
-
-  @override
-  Future<Result<void>> signOut() async {
-    userState.value = UserUnlogged();
-    return const Result.ok(null);
-  }
-
-  @override
-  FutureResult<String> signIn(SignCredentials credentials) async {
-    userState.value = UserLogged((fetchUser() as Ok<UserModel>).value);
-    return Result.ok('Login bem-sucedido (dev)');
-  }
-
   @override
   Result<UserModel> fetchUser() {
     return Result.ok(
       UserModel(
-        'dev_user',
+        'uuid_dev_user',
         email: 'dev@gmail.com',
         number: '61999999999',
         name: 'dev',
@@ -39,17 +22,34 @@ class AuthRepositoryDev extends AuthRepository {
   }
 
   @override
-  Future<Result<String>> resetPassword(String email) {
-    return Future.value(const Result.ok('success'));
+  FutureResult<String> signIn(Credentials credentials) async {
+    userState.value = UserLogged((fetchUser() as Ok<UserModel>).value);
+    return Result.ok('uuid_dev_user');
+  }
+
+  // @override
+  // Future<Result<String>> signInWithOtp({required String email}) async {
+  //   return const Result.ok("");
+  // }
+
+  @override
+  FutureResult<String> signUp(Credentials credentials) async {
+    return const Result.ok('uuid_dev');
   }
 
   @override
-  FutureResult<String> signUp(SignCredentials credentials) async {
-    return const Result.ok('Cadastro bem-sucedido (dev)');
+  FutureResultVoid signOut() async {
+    userState.value = UserUnlogged();
+    return const Result.ok(null);
   }
 
   @override
-  Future<Result<void>> addAuthStateListener(
+  FutureResultVoid resetPassword(String email) async {
+    return Future.value(Result.ok(null));
+  }
+
+  @override
+  FutureResultVoid addAuthStateListener(
     void Function() listener, {
     bool cancelOnError = false,
   }) async {
@@ -57,7 +57,13 @@ class AuthRepositoryDev extends AuthRepository {
   }
 
   @override
-  Future<Result<void>> removeAuthStateListener(void Function() onAuthStateChange) async {
+  FutureResultVoid removeAuthStateListener(void Function() onAuthStateChange) async {
+    return const Result.ok(null);
+  }
+
+  @override
+  FutureResultVoid setUserState(UserState newState) async {
+    userState.value = newState;
     return const Result.ok(null);
   }
 }

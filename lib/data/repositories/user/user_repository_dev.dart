@@ -1,13 +1,13 @@
-import '../../../domain/models/user/user.dart';
+import '../../../domain/models/user/user_model.dart';
 import '../../../utils/enums/user_role.dart';
 import '../../../utils/result.dart';
-import 'user_repository.dart';
+import '../../../domain/repositories/user/user_repository.dart';
 
 class UserRepositoryDev extends UserRepository {
   UserRepositoryDev({required super.service});
 
   @override
-  Future<Result<UserModel>> getUser({required String id}) async {
+  FutureResult<UserModel> getUser({required String id}) async {
     return Result.ok(
       UserModel(
         id,
@@ -22,7 +22,7 @@ class UserRepositoryDev extends UserRepository {
   }
   
   @override
-  Future<Result<List<UserModel>>> getUsers() async {
+  FutureResult<Users> getUsers() async {
     final usersMock = [
       UserModel(
         '1',

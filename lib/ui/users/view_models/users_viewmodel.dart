@@ -1,12 +1,23 @@
-import '../../../data/repositories/user/user_repository.dart';
-import '../../../domain/models/user/user.dart';
+import '../../../domain/repositories/user/user_repository.dart';
+import '../../../domain/models/user/user_model.dart';
 import '../../../utils/command.dart';
+import '../../../utils/result.dart';
 
 class UsersViewmodel {
-  final UserRepository userRepository;
-  UsersViewmodel({required this.userRepository}) {
-    getUsers = Command0<List<UserModel>>(userRepository.getUsers)..execute();
+  UsersViewmodel({required UserRepository userRepository}) 
+  : _userRepository = userRepository {
+    getUsers = Command0<Users>(_getUsers)..execute();
   }
 
-  late Command0<List<UserModel>> getUsers;
+  final UserRepository _userRepository;
+
+  late Command0<Users> getUsers;
+
+  FutureResult<Users> _getUsers() async {
+    final resultGetUsers = await _userRepository.getUsers();
+    if (resultGetUsers is Error<Users>) {
+      return Result.error(resultGetUsers.error);
+    }
+    return Result.ok((resultGetUsers as Ok<Users>).value);
+  }
 }

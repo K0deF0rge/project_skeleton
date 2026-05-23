@@ -1,11 +1,16 @@
 import '../../../../config/constants.dart';
-import '../../../../core/logger.dart';
+import '../../../../data/models/credentials.dart';
+import '../../../../data/repositories/role/user_repository_provider.dart';
+import '../../../../data/repositories/user/user_repository_provider.dart';
+import '../../../../domain/use_cases/auth/auth_sign_up_use_case.dart';
+import '../../../../utils/exceptions/credentials_exception.dart';
 import '../../../../utils/extensions/context.dart';
 import '../../../../utils/result.dart';
 import '../../../../utils/validators/email_validator.dart';
 import '../../../../utils/validators/password_validator.dart';
 import '../../../../data/repositories/auth/auth_repository_provider.dart';
 import '../../../core/localization/applocalization.dart';
+import '../../../home/widgets/home_screen.dart';
 import '../view_models/signup_viewmodel.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -19,136 +24,172 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _emailController;
-  late TextEditingController _passwordController;
-  late TextEditingController _confirmPasswordController;
-  late SignupViewmodel _viewmodel;
+  late TextEditingController emailController;
+  late TextEditingController passwordController;
+  late TextEditingController confirmPasswordController;
+  late SignupViewmodel viewmodel;
+  late AppLocalization localization;
+
+  @override
+  void initState() {
+    emailController = TextEditingController();
+    passwordController = TextEditingController();
+    confirmPasswordController = TextEditingController();
+    super.initState();
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     if (widget.viewmodel != null) {
-      _viewmodel = widget.viewmodel!;
+      viewmodel = widget.viewmodel!;
     } else {
-      final authRepository = AuthRepositoryProvider.of(context);
-      _viewmodel = SignupViewmodel(authRepository: authRepository);
+      viewmodel = SignupViewmodel(
+        signUpUseCase: AuthSignUpUseCase(
+          authRepository: AuthRepositoryProvider.of(context),
+          roleRepository: RoleRepositoryProvider.of(context),
+          userRepository: UserRepositoryProvider.of(context),
+        ),
+      );
     }
-  }
-
-  void _register() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
-    await _viewmodel.signup.execute(email, password);
-
-    if (!mounted) return;
-
-    context.showSnackBar(
-      _viewmodel.signup.error
-          ? (_viewmodel.signup.result as Error).error.toString()
-          : (_viewmodel.signup.result as Ok<String>).value,
-      isError: _viewmodel.signup.error,
-    );
-
-    if (_viewmodel.signup.result is Ok<String>) {
-      Navigator.of(context).pop();
-    }
-  }
-
-  String? _validatePasswordMatch(String? value) {
-    final password = _passwordController.text.trim();
-    final confirmPassword = _confirmPasswordController.text.trim();
-    if (password != confirmPassword) {
-      return 'As senhas não coincidem.';
-    }
-    return null;
-  }
-
-  @override
-  void initState() {
-    _emailController = TextEditingController();
-    _passwordController = TextEditingController();
-    _confirmPasswordController = TextEditingController();
-    super.initState();
+    viewmodel.signup.addListener(onResult);
   }
 
   @override
   void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _confirmPasswordController.dispose();
+    viewmodel.signup.removeListener(onResult);
+    emailController.dispose();
+    passwordController.dispose();
+    confirmPasswordController.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    AppLogger.debug('Building SignupScreen');
+    localization = AppLocalization.of(context);
     return Scaffold(
-      appBar: AppBar(title: const Text('Cadastrar-se')),
-      body: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(
-            vertical: mediumSpacing,
-            horizontal: largeSpacing,
-          ),
-          child: Column(
-            children: [
-              colDividerLarge2,
-              TextFormField(
-                controller: _emailController,
-                decoration: const InputDecoration(labelText: 'E-mail'),
-                validator: (String? email) {
-                  LocalizationKey? validationKey = EmailValidator.validator(
-                    email,
-                  );
+      appBar: AppBar(title: Text(localization.signUpTitle)),
+      body: SafeArea(
+        child: Form(
+          key: _formKey,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: mediumSpacing,
+              horizontal: largeSpacing,
+            ),
+            child: Column(
+              children: [
+                colDividerLarge2,
+                TextFormField(
+                  controller: emailController,
+                  decoration: InputDecoration(labelText: localization.emailLabel),
+                  validator: (String? email) {
+                    LocalizationKey? validationKey = EmailValidator.validator(
+                      email,
+                    );
 
-                  if (validationKey != null) {
-                    return AppLocalization.of(
-                      context,
-                    ).getTextByKey(validationKey);
-                  }
+                    if (validationKey != null) {
+                      return localization.getTextByKey(validationKey);
+                    }
 
-                  return null;
-                },
-              ),
-              colDividerMedium,
-              TextFormField(
-                controller: _passwordController,
-                decoration: const InputDecoration(labelText: 'Senha'),
-                obscureText: true,
-                validator: PasswordValidator.validator,
-              ),
-              colDividerMedium,
-              TextFormField(
-                controller: _confirmPasswordController,
-                decoration: const InputDecoration(
-                  labelText: 'Confirme a Senha',
+                    return null;
+                  },
                 ),
-                obscureText: true,
-                validator: _validatePasswordMatch,
-              ),
-              colDividerLarge2,
+                colDividerMedium,
+                TextFormField(
+                  controller: passwordController,
+                  decoration: InputDecoration(
+                    labelText: localization.passwordLabel,
+                  ),
+                  obscureText: true,
+                  validator: (String? password) {
+                    LocalizationKey? validationKey = PasswordValidator.validator(
+                      password,
+                    );
 
-              ListenableBuilder(
-                listenable: _viewmodel.signup,
-                builder: (context, _) {
-                  return ElevatedButton(
-                    onPressed: _viewmodel.signup.running ? null : _register,
-                    child: Text(
-                      _viewmodel.signup.running
-                          ? 'Cadastrando...'
-                          : 'Cadastrar-se',
-                    ),
-                  );
-                },
-              ),
-            ],
+                    if (validationKey != null) {
+                      return localization.getTextByKey(validationKey);
+                    }
+
+                    return null;
+                  },
+                ),
+                colDividerMedium,
+                TextFormField(
+                  controller: confirmPasswordController,
+                  decoration: InputDecoration(
+                    labelText: localization.confirmPasswordLabel,
+                  ),
+                  obscureText: true,
+                  validator: validatePasswordMatch,
+                ),
+                colDividerLarge2,
+                ListenableBuilder(
+                  listenable: viewmodel.signup,
+                  builder: (context, _) {
+                    return ElevatedButton(
+                      onPressed: viewmodel.signup.running ? null : register,
+                      child: Text(
+                        viewmodel.signup.running
+                            ? localization.signUpLoadingLabel
+                            : localization.signUpButtonLabel,
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
+  }
+
+  void onResult() {
+    if (!mounted) return;
+
+    if (viewmodel.signup.result == null) return;
+
+    LocalizationKey locKey;
+
+    if (viewmodel.signup.completed) {
+      locKey = LocalizationKey.signUpSuccess;
+      viewmodel.signup.clearResult();
+      Navigator.pushReplacementNamed(context, HomeScreen.routeName);
+    } else {
+      final error = (viewmodel.signup.result as Error).error;
+
+      switch (error) {
+        case CredentialsException(:final localizationKey):
+          locKey = localizationKey;
+          break;
+        default:
+          locKey = LocalizationKey.unknownError;
+          break;
+      }
+    }
+
+    context.showSnackBar(
+      localization.getTextByKey(locKey),
+      isError: viewmodel.signup.error,
+    );
+  }
+
+  void register() {
+    if (!_formKey.currentState!.validate()) return;
+
+    final email = emailController.text.trim();
+    final password = passwordController.text.trim();
+
+    viewmodel.signup.execute(Credentials(email: email, password: password));
+  }
+
+  String? validatePasswordMatch(String? value) {
+    final password = passwordController.text.trim();
+    final confirmPassword = confirmPasswordController.text.trim();
+    if (password != confirmPassword) {
+      return localization.passwordMismatchError;
+    }
+    return null;
   }
 }

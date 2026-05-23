@@ -1,5 +1,5 @@
 import '../../../domain/models/base.dart';
-import '../../../domain/models/user/user.dart';
+import '../../domain/models/user/user_model.dart';
 
 class UserState extends BaseModel {
   @override

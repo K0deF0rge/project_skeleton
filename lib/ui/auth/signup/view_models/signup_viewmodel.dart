@@ -1,18 +1,19 @@
-
-import '../../../../data/repositories/auth/auth_repository.dart';
-import '../../../../data/services/api/supabase/auth_service.dart';
+import '../../../../data/models/credentials.dart';
+import '../../../../domain/use_cases/auth/auth_sign_up_use_case.dart';
 import '../../../../utils/command.dart';
 import '../../../../utils/result.dart';
 
 class SignupViewmodel {
-  final AuthRepository authRepository;
-  SignupViewmodel({required this.authRepository}) {
-    signup = Command2<String, String, String>(_signUp);
+  SignupViewmodel({required AuthSignUpUseCase signUpUseCase})
+    : _signUpUseCase = signUpUseCase {
+    signup = Command1<void, Credentials>(_signUp);
   }
 
-  late Command2<String, String, String> signup;
+  final AuthSignUpUseCase _signUpUseCase;
 
-  FutureResult<String> _signUp(String email, String password) async {
-    return await authRepository.signUp(SignCredentials(email: email, password: password));
+  late Command1<void, Credentials> signup;
+
+  FutureResultVoid _signUp(Credentials credentials) async {
+    return await _signUpUseCase.execute(credentials);
   }
 }

@@ -1,20 +1,20 @@
 
-import '../../../domain/models/role/role.dart';
+import '../../../domain/models/role/role_model.dart';
 import '../../../utils/result.dart';
-import 'role_repository.dart';
+import '../../../domain/repositories/role/role_repository.dart';
 
 class RoleRepositoryDev extends RoleRepository {
   RoleRepositoryDev();
 
   @override
-  FutureResult<List<Role>> getRolesByUserId(String userId) async {
-    return Result.ok(<Role>[
-      Role(
+  FutureResult<Roles> getRolesByUserId(String userId) async {
+    return Result.ok(<RoleModel>[
+      RoleModel(
         0,
         userId: userId,
         module: Modules.users,
       ),
-      Role(
+      RoleModel(
         0,
         userId: userId,
         module: Modules.products,
