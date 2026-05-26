@@ -83,10 +83,8 @@ class AuthRepositoryRemote extends AuthRepository {
   }
 
   @override
-  FutureResultVoid resetPassword(String email) async {
-    final result = await authService.resetPassword(
-      Credentials(email: email, password: ''),
-    );
+  FutureResultVoid resetPassword(Credentials credentials) async {
+    final result = await _authService.resetPassword(credentials);
     if (result is Error) return Result.error(result.error);
 
     return Result.ok(null);

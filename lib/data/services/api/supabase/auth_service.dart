@@ -50,9 +50,7 @@ class AuthService {
     }
   }
 
-  FutureResultVoid resetPassword(
-    Credentials credentials,
-  ) async {
+  FutureResultVoid resetPassword(Credentials credentials) async {
     try {
       await supabase.auth.resetPasswordForEmail(credentials.email);
 
