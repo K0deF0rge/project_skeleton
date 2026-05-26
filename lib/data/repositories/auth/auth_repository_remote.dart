@@ -149,10 +149,12 @@ class AuthRepositoryRemote extends AuthRepository {
 
   @override
   FutureResultVoid setUserState(UserState newState) async {
-    userState.value = newState;
-    final localResult = await localService.save(newState);
-    if (localResult is Error) return Result.error(localResult.error);
+    final localResult = await _localService.save(newState);
 
-    return const Result.ok(null);
+    if (localResult is Ok) {
+      userState.value = newState;
+    }
+
+    return localResult;
   }
 }
