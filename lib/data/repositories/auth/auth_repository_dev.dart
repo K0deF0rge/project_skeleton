@@ -7,16 +7,18 @@ import '../../../domain/repositories/auth/auth_repository.dart';
 
 class AuthRepositoryDev extends AuthRepository {
   @override
-  Result<UserModel> fetchUser() {
+  Result<UserState> fetchUser() {
     return Result.ok(
-      UserModel(
-        'uuid_dev_user',
-        email: 'dev@gmail.com',
-        number: '61999999999',
-        name: 'dev',
-        updatedAt: DateTime.now(),
-        createdAt: DateTime.now(),
-        role: UserRole.owner,
+      UserLogged(
+        UserModel(
+          'uuid_dev_user',
+          email: 'dev@gmail.com',
+          number: '61999999999',
+          name: 'dev',
+          updatedAt: DateTime.now(),
+          createdAt: DateTime.now(),
+          role: UserRole.owner,
+        ),
       ),
     );
   }
