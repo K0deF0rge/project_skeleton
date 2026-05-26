@@ -134,9 +134,9 @@ class AuthRepositoryRemote extends AuthRepository {
 
     if (session != null) {
       final userFetched = fetchUser();
-      if (userFetched is Error) {
+      if (userFetched is Error<UserState>) {
         setUserState(UserUnlogged());
-        return userFetched;
+        return Result.error(userFetched.error);
       }
       final user = (userFetched as Ok<UserModel>).value;
       setUserState(UserLogged(user));
