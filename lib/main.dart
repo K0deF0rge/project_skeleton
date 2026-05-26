@@ -23,16 +23,19 @@ void main() async {
   );
   sharedPreferences = await SharedPreferences.getInstance();
   final supabase = Supabase.instance.client;
+  final authRepository = AuthRepositoryRemote(
+    authService: AuthService(supabase: supabase),
+    localService: LocalService<UserState>(
+      UserState.key(),
+      toModel: UserState.fromJson,
+    ),
+  );
+
+  await authRepository.initialize();
 
   runApp(
     MyApp(
-      authRepository: AuthRepositoryRemote(
-        authService: AuthService(supabase: supabase),
-        localService: LocalService<UserState>(
-          UserState.key(),
-          toModel: UserState.fromJson,
-        ),
-      ),
+      authRepository: authRepository,
       userRepository: UserRepositoryRemote(
         apiService: APIService<UserModel>(
           supabase: supabase,

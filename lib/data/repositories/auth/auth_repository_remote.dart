@@ -13,39 +13,34 @@ export 'auth_repository_provider.dart';
 
 class AuthRepositoryRemote extends AuthRepository {
   AuthRepositoryRemote({
-    required this.authService,
-    required this.localService,
-  }) {
+    required AuthService authService,
+    required LocalService<UserState> localService,
+  }) : _authService = authService,
+       _localService = localService;
+
+  FutureResultVoid initialize() async {
     onDataAuthStateChange = OnData(_onDataAuthStateChange);
 
     final fetched = fetchUser();
-    if (fetched is Ok<UserModel>) {
-      setUserState(UserLogged(fetched.value));
+    if (fetched is Ok<UserState>) {
+      return await setUserState(fetched.value);
     } else {
-      setUserState(UserUnlogged());
+      return await setUserState(userUnlogged);
     }
   }
 
-  final AuthService authService;
-  final LocalService<UserState> localService;
+  final AuthService _authService;
+  final LocalService<UserState> _localService;
   StreamSubscription<AuthState>? _authStateSubscription;
 
   @override
-  Result<UserModel> fetchUser() {
-    final result = localService.get();
-
-    if (result is Error<UserState>) return Result.error(result.error);
-
-    if (result is Ok<UserState>) {
-      return Result.ok((result.value as UserLogged).user);
-    }
-
-    return Result.error(Exception('Unknown error'));
+  Result<UserState> fetchUser() {
+    return _localService.get();
   }
 
   @override
   FutureResult<String> signIn(Credentials credentials) async {
-    final result = await authService.signIn(credentials);
+    final result = await _authService.signIn(credentials);
     if (result is Error<User>) return Result.error(result.error);
 
     final supabaseUser = (result as Ok<User>).value;
@@ -55,7 +50,7 @@ class AuthRepositoryRemote extends AuthRepository {
 
   // @override
   // FutureResultVoid signInWithOtp({required String email}) async {
-  //   final result = await authService.signInWithOtp(
+  //   final result = await _authService.signInWithOtp(
   //     Credentials(email: email, password: ''),
   //   );
   //   if (result is Error) return result;
@@ -63,7 +58,7 @@ class AuthRepositoryRemote extends AuthRepository {
 
   @override
   FutureResult<String> signUp(Credentials credentials) async {
-    final result = await authService.signUp(credentials);
+    final result = await _authService.signUp(credentials);
     if (result is Error<User>) return Result.error(result.error);
 
     final supabaseUser = (result as Ok<User>).value;
@@ -73,13 +68,12 @@ class AuthRepositoryRemote extends AuthRepository {
 
   @override
   FutureResultVoid signOut() async {
-    final result = await authService.signOut();
+    final result = await _authService.signOut();
     if (result is Error) {
       return result;
     }
 
-    final resultSaveUser = await setUserState(UserUnlogged());
-    ;
+    final resultSaveUser = await setUserState(userUnlogged);
 
     if (resultSaveUser is Error) {
       return resultSaveUser;
@@ -108,7 +102,7 @@ class AuthRepositoryRemote extends AuthRepository {
     try {
       onDataAuthStateChange.addListener(onAuthStateChange);
 
-      _authStateSubscription = authService.supabase.auth.onAuthStateChange
+      _authStateSubscription = _authService.supabase.auth.onAuthStateChange
           .listen(
             onDataAuthStateChange.execute,
             onError: (error) {},

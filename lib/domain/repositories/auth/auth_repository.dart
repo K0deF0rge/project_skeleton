@@ -15,7 +15,9 @@ abstract class AuthRepository {
 
   late OnData onDataAuthStateChange;
 
-  Result<UserModel> fetchUser();
+  final userUnlogged = UserUnlogged();
+
+  Result<UserState> fetchUser();
 
   FutureResult<String> signIn(Credentials credentials);
   // feature
