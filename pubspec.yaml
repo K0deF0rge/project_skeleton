@@ -33,6 +33,7 @@ dev_dependencies:
   freezed: ^3.2.5
   json_serializable: ^6.11.1
   mocktail: ^1.0.4
+  mock_supabase_http_client: ^0.0.3+2
 
 flutter:
   uses-material-design: true
