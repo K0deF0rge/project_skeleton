@@ -13,7 +13,7 @@ class RoleRepositoryRemote extends RoleRepository {
 
   @override
   FutureResult<Roles> getRolesByUserId(String userId) async {
-    final result = await apiService.get(filters: [SupabaseFilter('user_id', SupabaseOperator.eq, userId)], noLimit: true);
+    final result = await apiService.get(filters: [SupabaseFilter('user_id', FilterOperator.eq, userId)], noLimit: true);
     if (result is Error<Roles>) return Result.error(result.error);
 
     final roles = (result as Ok<Roles>).value;
