@@ -109,7 +109,7 @@ class AuthRepositoryRemote extends AuthRepository {
 
       return const Result.ok(null);
     } catch (e) {
-      return Result.error(Exception('Failed to add auth state listener: $e'));
+      return Result.error(Exception(e));
     }
   }
 
@@ -123,9 +123,7 @@ class AuthRepositoryRemote extends AuthRepository {
       _authStateSubscription = null;
       return const Result.ok(null);
     } catch (e) {
-      return Result.error(
-        Exception('Failed to remove auth state listener: $e'),
-      );
+      return Result.error(Exception(e));
     }
   }
 

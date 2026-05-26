@@ -72,49 +72,49 @@ class APIService<T extends BaseModel> extends ChangeNotifier {
     } on Exception catch (error) {
       return Result.error(error);
     } catch (error) {
-      return Result.error(Exception('Erro desconhecido'));
+      return Result.error(Exception(error));
     }
   }
 
-  Future<Result<T>> update(T model) async {
+  FutureResultVoid update(T model) async {
     try {
       await supabase
           .from(tableName)
           .update(model.toJson())
           .eq('id', model.toJson()['id']);
-      return Result.ok(model);
+      return Result.ok(null);
     } on PostgrestException catch (error) {
       return Result.error(error);
     } on Exception catch (error) {
       return Result.error(error);
     } catch (error) {
-      return Result.error(Exception('Erro desconhecido'));
+      return Result.error(Exception(error));
     }
   }
 
-  Future<Result<T>> create(T model) async {
+  FutureResultVoid create(T model) async {
     try {
       await supabase.from(tableName).insert([model.toJson()]);
-      return Result.ok(model);
+      return Result.ok(null);
     } on PostgrestException catch (error) {
       return Result.error(error);
     } on Exception catch (error) {
       return Result.error(error);
     } catch (error) {
-      return Result.error(Exception('Erro desconhecido'));
+      return Result.error(Exception(error));
     }
   }
 
-  Future<Result<bool>> delete(String id) async {
+  FutureResultVoid delete(String id) async {
     try {
       await supabase.from(tableName).delete().eq('id', id);
-      return Result.ok(true);
+      return Result.ok(null);
     } on PostgrestException catch (error) {
       return Result.error(error);
     } on Exception catch (error) {
       return Result.error(error);
     } catch (error) {
-      return Result.error(Exception('Erro desconhecido'));
+      return Result.error(Exception(error));
     }
   }
 }
