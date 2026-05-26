@@ -26,7 +26,7 @@ abstract class AuthRepository {
   FutureResult<String> signUp(Credentials credentials);
   FutureResultVoid signOut();
 
-  FutureResultVoid resetPassword(String email);
+  FutureResultVoid resetPassword(Credentials credentials);
 
   FutureResultVoid addAuthStateListener(
     void Function() listener, {

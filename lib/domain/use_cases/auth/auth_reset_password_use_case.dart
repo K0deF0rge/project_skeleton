@@ -17,9 +17,7 @@ class AuthResetPasswordUseCase {
       return Result.error(emailException);
     }
 
-    final resetPasswordResult = await authRepository.resetPassword(
-      credentials.email,
-    );
+    final resetPasswordResult = await authRepository.resetPassword(credentials);
 
     if (resetPasswordResult is Error) {
       _log.warning('Reset password failed: ${resetPasswordResult.error}');
