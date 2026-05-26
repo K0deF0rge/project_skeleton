@@ -25,7 +25,7 @@ class APIService<T extends BaseModel> extends ChangeNotifier {
 
   bool get hasMore => _hasMore;
 
-  Future<Result<List<T>>> get({
+  FutureResult<List<T>> get({
     List<SupabaseFilter>? filters,
     int? limit,
     int? offset,
