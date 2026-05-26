@@ -59,7 +59,9 @@ class AuthRepositoryDev extends AuthRepository {
   }
 
   @override
-  FutureResultVoid removeAuthStateListener(void Function() onAuthStateChange) async {
+  FutureResultVoid removeAuthStateListener(
+    void Function() onAuthStateChange,
+  ) async {
     return const Result.ok(null);
   }
 
