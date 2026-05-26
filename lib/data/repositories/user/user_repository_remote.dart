@@ -15,7 +15,7 @@ class UserRepositoryRemote extends UserRepository {
   @override
   FutureResult<UserModel> getUser({required String id}) async {
     final userIdToFetch = id;
-    final filters = [SupabaseFilter('id', SupabaseOperator.eq, userIdToFetch)];
+    final filters = [SupabaseFilter('id', FilterOperator.eq, userIdToFetch)];
 
     final userResult = await apiService.get(filters: filters, limit: 1, offset: 0);
 

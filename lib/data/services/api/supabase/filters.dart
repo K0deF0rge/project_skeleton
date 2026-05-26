@@ -1,6 +1,6 @@
 class SupabaseFilter {
   final String field;
-  final SupabaseOperator operator;
+  final FilterOperator operator;
   final dynamic value;
   SupabaseFilter(this.field, this.operator, this.value);
 }
@@ -14,7 +14,7 @@ class Filter {
   void clearFilters() => _filters.clear();
 }
 
-enum SupabaseOperator {
+enum FilterOperator {
   eq('eq', 'Igual a'),
   neq('neq', 'Diferente de'),
   gt('gt', 'Maior que'),
@@ -36,5 +36,5 @@ enum SupabaseOperator {
 
   final String value;
   final String description;
-  const SupabaseOperator(this.value, this.description);
+  const FilterOperator(this.value, this.description);
 }
