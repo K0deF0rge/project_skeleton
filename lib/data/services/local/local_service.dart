@@ -1,7 +1,6 @@
 import 'dart:convert';
 
 import '../../../../utils/result.dart';
-import '../../../core/logger.dart';
 import '../../../domain/models/base.dart';
 import 'shared_preferences.dart';
 
@@ -19,14 +18,11 @@ class LocalService<T extends BaseModel> {
   FutureResultVoid save(T model, {String key = ''}) async {
     final k = '$_key${key.isNotEmpty ? '_$key' : ''}';
     try {
-      AppLogger.debug("\nLocalServicee: K $k - map ${_map(model)}");
-
       final succeded = await sharedPreferences.setString(
         k,
         _map(model),
       );
 
-      AppLogger.debug("\nLocalServicee: succeded $succeded");
       if (!succeded) {
         return Result.error(Exception('Failed to save user data'));
       }
@@ -42,14 +38,11 @@ class LocalService<T extends BaseModel> {
   Result<T> get({String key = ''}) {
     final k = '$_key${key.isNotEmpty ? '_$key' : ''}';
     try {
-      AppLogger.debug("\nLocalServicee: get $k");
       String? response = sharedPreferences.getString(k);
 
       if (response == null) {
         return Result.error(Exception('No data found for key $k'));
       }
-
-      AppLogger.debug("LocalServicee: response get $response");
 
       final model = toModel(_model(response));
 
