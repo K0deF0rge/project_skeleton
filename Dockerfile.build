@@ -1,0 +1,24 @@
+FROM ubuntu:22.04
+
+RUN apt-get update && apt-get install -y \
+  curl git unzip xz-utils zip libglu1-mesa
+
+RUN git clone https://github.com/flutter/flutter.git /opt/flutter
+
+ENV PATH="/opt/flutter/bin:/opt/flutter/bin/cache/dart-sdk/bin:${PATH}"
+ENV PUB_CACHE=/home/flutter/.pub-cache
+
+RUN useradd -ms /bin/bash flutter
+RUN chown -R flutter:flutter /opt/flutter
+
+USER flutter
+WORKDIR /app
+
+COPY --chown=flutter:flutter pubspec.* ./
+
+RUN flutter clean
+RUN flutter pub get
+
+COPY --chown=flutter:flutter . .
+
+RUN flutter build web
