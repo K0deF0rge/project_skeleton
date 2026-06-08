@@ -13,17 +13,25 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late AuthRepository authRepository;
-  // late SplashViewmodel _viewmodel;
-  bool _initialized = false;
+  late SplashViewmodel viewmodel;
+  bool _didInitDependencies = false;
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.viewmodel != null) {
+      viewmodel = widget.viewmodel!;
+    }
+  }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (!_initialized) {
-      authRepository = AuthRepositoryProvider.of(context);
-      // _viewmodel = widget.viewmodel ?? SplashViewmodel(authRepository: authRepository);
-      _initialized = true;
+    if (!_didInitDependencies) {
+      if (widget.viewmodel == null) {
+        viewmodel = SplashViewmodel(authRepository: AuthRepositoryProvider.of(context));
+      }
+      _didInitDependencies = true;
     }
   }
 
