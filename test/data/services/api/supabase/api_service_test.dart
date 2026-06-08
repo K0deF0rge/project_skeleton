@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mock_supabase_http_client/mock_supabase_http_client.dart';
 import 'package:project_skeleton/data/services/api/supabase/filters.dart';
+import 'package:project_skeleton/domain/models/user/user_model.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import 'package:project_skeleton/data/services/api/supabase/api_service.dart';
@@ -72,14 +73,14 @@ void main() {
 
     test('should get records with custom filter', () async {
       List<SupabaseFilter> filters = [
-        SupabaseFilter('id', FilterOperator.eq, 1),
+        SupabaseFilter('id', FilterOperator.eq, uuidDevUser2),
       ];
       final result = await apiService.get(filters: filters);
 
       expect(result, isA<Ok<Users>>());
       final user = (result as Ok<Users>).value.first;
 
-      expect(user.name, equals(kUserModel.name));
+      expect(user.name, equals(nameDevUser2));
       expect(result.value.length, equals(1));
     });
   });
@@ -88,7 +89,7 @@ void main() {
     test('should update a record successfully', () async {
       final newName = 'Updated Name';
       List<SupabaseFilter> filters = [
-        SupabaseFilter('id', FilterOperator.eq, 1),
+        SupabaseFilter('id', FilterOperator.eq, uuidDevUser2),
       ];
 
       final resultGet = await apiService.get(filters: filters);
@@ -96,9 +97,13 @@ void main() {
       expect(user.name, equals(nameDevUser2));
 
       final updatedUser = UserModel(
-        id: user.id,
+        user.id,
         name: newName,
         email: user.email,
+        number: user.number,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        role: user.role,
       );
 
       final result = await apiService.update(updatedUser);
@@ -112,7 +117,7 @@ void main() {
 
   group('delete', () {
     test('should delete a record successfully', () async {
-      final id = '3';
+      final id = uuidDevUser3;
       final resultDelete = await apiService.delete(id);
 
       expect(resultDelete, isA<Ok>());
