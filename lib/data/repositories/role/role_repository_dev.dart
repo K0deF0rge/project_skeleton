@@ -15,7 +15,7 @@ class RoleRepositoryDev extends RoleRepository {
         module: Modules.users,
       ),
       RoleModel(
-        0,
+        1,
         userId: userId,
         module: Modules.products,
       ),

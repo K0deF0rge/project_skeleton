@@ -31,7 +31,7 @@ void main() {
     mockUser = MockUser();
 
     userModel = UserModel(
-      'uuid_test',
+      userId,
       number: '61999999999',
       name: 'test',
       email: 'test@example.com',

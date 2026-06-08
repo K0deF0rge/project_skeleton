@@ -21,9 +21,9 @@ class UserModel extends BaseModel {
   @JsonKey(defaultValue: UserRole.user)
   final UserRole role;
   @JsonKey(includeFromJson: false, includeToJson: false)
-  List<RoleModel> roles;
+  Roles roles;
 
-  void setRoles(List<RoleModel> newRoles) {
+  void setRoles(Roles newRoles) {
     roles.clear();
     roles.addAll(newRoles);
   }

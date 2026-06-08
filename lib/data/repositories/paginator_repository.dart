@@ -1,4 +1,3 @@
-
 import '../../domain/models/base.dart';
 import '../../utils/result.dart';
 import '../services/api/supabase/api_service.dart';
@@ -25,17 +24,16 @@ class RepositoryPaginator<T extends BaseModel> {
   }
 
   Future<Result<List<T>>> nextPage() async {
-    final List<T> empty = [];
-    if (!_hasMore || _isLoading) return Result.ok(empty);
+    if (!_hasMore || _isLoading) return Result.ok([]);
     _isLoading = true;
     try {
-      final res = service != null
-          ? await service!.get(
-              filters: _filter.filters,
-              limit: pageSize,
-              offset: _offset,
-            )
-          : Result.ok(empty);
+      if (service == null) return Result.ok([]);
+
+      final res = await service!.get(
+        filters: _filter.filters,
+        limit: pageSize,
+        offset: _offset,
+      );
 
       if (res is Error<List<T>>) {
         return res;
