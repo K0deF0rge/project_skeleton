@@ -59,15 +59,15 @@ void main() {
     test('should get all records without limit', () async {
       final result = await apiService.get();
 
-      expect(result, isA<Ok<List<UserModel>>>());
-      expect((result as Ok<List<UserModel>>).value.length, equals(3));
+      expect(result, isA<Ok<Users>>());
+      expect((result as Ok<Users>).value.length, equals(3));
     });
 
     test('should get records with custom limit and offset', () async {
       final result = await apiService.get(limit: 1, offset: 0);
 
-      expect(result, isA<Ok<List<UserModel>>>());
-      expect((result as Ok<List<UserModel>>).value.length, equals(1));
+      expect(result, isA<Ok<Users>>());
+      expect((result as Ok<Users>).value.length, equals(1));
     });
 
     test('should get records with custom filter', () async {
@@ -76,8 +76,8 @@ void main() {
       ];
       final result = await apiService.get(filters: filters);
 
-      expect(result, isA<Ok<List<UserModel>>>());
-      final user = (result as Ok<List<UserModel>>).value.first;
+      expect(result, isA<Ok<Users>>());
+      final user = (result as Ok<Users>).value.first;
 
       expect(user.name, equals(kUserModel.name));
       expect(result.value.length, equals(1));
@@ -92,8 +92,8 @@ void main() {
       ];
 
       final resultGet = await apiService.get(filters: filters);
-      final user = (resultGet as Ok<List<UserModel>>).value.first;
-      expect(user.name, equals(kUserModel.name));
+      final user = (resultGet as Ok<Users>).value.first;
+      expect(user.name, equals(nameDevUser2));
 
       final updatedUser = UserModel(
         id: user.id,
@@ -105,7 +105,7 @@ void main() {
       expect(result, isA<Ok>());
 
       final resultGet2 = await apiService.get(filters: filters);
-      final user2 = (resultGet2 as Ok<List<UserModel>>).value.first;
+      final user2 = (resultGet2 as Ok<Users>).value.first;
       expect(user2.name, equals(newName));
     });
   });
@@ -119,8 +119,8 @@ void main() {
 
       final resultGet = await apiService.get();
 
-      expect(resultGet, isA<Ok<List<UserModel>>>());
-      expect((resultGet as Ok<List<UserModel>>).value.length, equals(2));
+      expect(resultGet, isA<Ok<Users>>());
+      expect((resultGet as Ok<Users>).value.length, equals(2));
 
       final deletedUser = resultGet.value.where((u) => u.id == id);
       expect(deletedUser.isEmpty, isTrue);
